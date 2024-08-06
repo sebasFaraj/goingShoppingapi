@@ -116,9 +116,7 @@ router.delete('/:productId', (req, res, next) => {
     .catch(err => {
         res.status(500).json({error: err});
     })
-    
-    res.status(200).json({message: "this is the method to delete a product"});
-})
+});
 
 //Edit a product
 router.patch('/', (req, res, next) => {
@@ -133,9 +131,6 @@ router.patch('/', (req, res, next) => {
     ]
     By doing this, I can create an object that will then be the used to change the product
     */
-
-
-    const productId = req.body.productID
 
     let updateFields = {};
 
@@ -154,10 +149,7 @@ router.patch('/', (req, res, next) => {
         console.log(err);
         res.status(500).json(err);
     })
-
-
-    res.status(200).json({message: "this is the method to edit/patch a product"});
-})
+});
 
 
 module.exports = router;

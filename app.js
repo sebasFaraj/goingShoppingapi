@@ -11,7 +11,7 @@ const orderRoutes = require('./routes/orders');
 const userRoutes = require('./routes/users');
 
 //Connect to MongoDB
-mongoose.connect('mongodb+srv://sebasFaraj:c48Up8HDODJBF1qL@shopcluster.vsctqik.mongodb.net/?retryWrites=true&w=majority&appName=shopCluster')
+mongoose.connect('mongodb+srv://sebasFaraj:' + process.env.MONGO_ATLAS_PW + '@shopcluster.vsctqik.mongodb.net/?retryWrites=true&w=majority&appName=shopCluster')
 
 //Start logging
 app.use(morgan('dev'));

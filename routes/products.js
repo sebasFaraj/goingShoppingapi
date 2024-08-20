@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 const Product = require('../models/product');
-
+const checkAuth = require('../middleware/checkAuth');
 
 //Get all products
 router.get('/', (req, res, next) => {
@@ -67,13 +67,14 @@ router.get('/:productId', (req, res, next) => {
 // -------ADMIN ONLY
 
 //Add a new product
-router.post('/', (req, res, next) => {
+router.post('/',  checkAuth, (req, res, next) => {
     const newProduct = new Product({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
         price: req.body.price,
         category: req.body.category,
-        availability: req.body.availability
+        availability: req.body.availability,
+        newProduct: req.body.newProduct,
     });
 
     newProduct.save()
@@ -104,30 +105,35 @@ router.post('/', (req, res, next) => {
 });
 
 //Delete a product
-router.delete('/:productId', (req, res, next) => {
-    
-    const productId = req.params.productID;
+router.delete('/:productID', (req, res, enxt) => {
+   
+    const id = req.params.productID;
 
-    Product.deleteOne({_id: productId})
+    //This removes any property in our database that has the id specified in the URL
+    Product.deleteOne({_id: id})
     .exec()
     .then(result => {
         res.status(200).json(result);
     })
     .catch(err => {
+        console.log(err);
         res.status(500).json({error: err});
-    })
-});
+    }) 
+
+})
 
 //Edit a product
-router.patch('/', (req, res, next) => {
+router.patch('/:productId',  checkAuth, (req, res, next) => {
+
+    const productId = req.params.productId; 
 
     //To dynamically select what fields of a product are going to be edited, the expected request will be different 
     /*
     Ex:
 
     [
-        {fieldName: field, newValue: vale},
-        {fieldName: field, newValue: vale},
+        {fieldName: field, newValue: value},
+        {fieldName: field, newValue: value},
     ]
     By doing this, I can create an object that will then be the used to change the product
     */

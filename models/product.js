@@ -6,7 +6,8 @@ const productSchema = mongoose.Schema({
     name: {type: String, required: true},
     price: {type: Number, required: true},
     category: {type: String, required: true}, //TODO: Set what the categories are in the future
-    availability: {type: Boolean, required: true} //Booleans are set with lowercase
+    availability: {type: Boolean, required: true}, //Booleans are set with lowercase
+    newProduct: {type: Boolean, required: true}
 })
 
 

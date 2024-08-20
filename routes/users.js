@@ -78,7 +78,7 @@ router.post('/login', (req, res, next) => {
                     const token = jwt.sign({
                         email: user[0].email,
                         userId: user[0]._id
-                    }, process.env.SECRET_KEY, {expiresIn: "1h"})
+                    }, process.env.SECRET_KEY, {expiresIn: "10h"})
                     
                     res.status(200).json({message: "Auth Succesfull", token: token});
                 }
@@ -98,7 +98,18 @@ router.post('/login', (req, res, next) => {
 
 
 router.delete('/:userId', (req, res, next) => {
-    res.status(200).json("Deleting a user");
+    const userId = req.params.userId;
+
+    User.deleteOne({_id: userId})
+    .exec()
+    .then(result => {
+        res.status(200).json(result);
+    })
+    .catch(err => {
+        res.status(500).json({error: err});
+    })
+
+
 })
 
 router.patch('/:userId', (req, res, next) => {

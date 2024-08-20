@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const checkAuth = require('../middleware/checkAuth');
 
 const Order = require('../models/order');
 const Product = require('../models/product');
 
 //Get all orders from a user
-router.get('/', (req, res, next) => {
+router.get('/', checkAuth, (req, res, next) => {
     Order.find()
     .select("_id product quantity date user")
     .exec()
@@ -21,7 +22,8 @@ router.get('/', (req, res, next) => {
                     product: result.product,
                     date: result.date,
                     user: result.user,
-                    quantity: result.quantity
+                    quantity: result.quantity,
+                    purchased: result.purchased
                 }
             })
         };
@@ -35,7 +37,7 @@ router.get('/', (req, res, next) => {
 });
 
 //Get one order from a user
-router.get('/:orderId', (req, res, next) => {
+router.get('/:orderId', checkAuth, (req, res, next) => {
     const orderId = req.params.orderId;
     
     Order.findById(orderId)
@@ -52,9 +54,10 @@ router.get('/:orderId', (req, res, next) => {
 
 });
 
-router.post('/:productId', (req, res, next) => {
+router.post('/:productId',  checkAuth, (req, res, next) => {
     const productId = req.params.productId;
     const quantity = req.body.quantity;
+    const purchased = req.body.purchased;
     const token = req.body.token;
     const user = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
 
@@ -72,7 +75,8 @@ router.post('/:productId', (req, res, next) => {
                 product: productId,
                 quantity: quantity,
                 date: new Date,
-                user: user.userId
+                user: user.userId,
+                purchased: purchased
             })
     
             newOrder.save()
@@ -109,7 +113,7 @@ router.post('/:productId', (req, res, next) => {
 
 
 //Delete an order from a user
-router.delete('/:orderId', (req, res, next) => {
+router.delete('/:orderId',  checkAuth, (req, res, next) => {
     const orderId = req.params.orderId;
     
     Order.deleteOne({_id: orderId})
@@ -126,5 +130,26 @@ router.delete('/:orderId', (req, res, next) => {
 
 
 });
+
+router.patch('/:orderId',  checkAuth, (req, res, next) => {
+    const orderId = req.params.orderId;
+
+    let updateFields = {};
+
+    for (let fields of req.body) {
+        updateFields[fields.fieldName] = fields.newvalue;
+    }
+
+    Product.updateOne({_id: orderId}, {$set: updateFields})
+    .exec()
+    .then(result => {
+        console.log(result);
+        res.status(200).json(result);
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json(err);
+    })
+})
 
 module.exports = router;

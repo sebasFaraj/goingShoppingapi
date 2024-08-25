@@ -8,7 +8,7 @@ const checkAuth = require('../middleware/checkAuth');
 router.get('/', (req, res, next) => {
 
     Product.find()
-    .select('name price category _id availability')
+    .select('name price category _id availability newProduct')
     .exec()
     .then(results => {
         console.log(results);
@@ -24,6 +24,7 @@ router.get('/', (req, res, next) => {
                     price: result.price,
                     category: result.category,
                     availability: result.availability,
+                    newProduct: result.newProduct,
                     _id: result._id,
                     request: {
                         type: "GET",
@@ -55,6 +56,7 @@ router.get('/:productId', (req, res, next) => {
             price: result.price,
             category: result.category,
             availability: result.availability,
+            newProduct: result.newProduct,
             _id: result._id 
         }
         
@@ -88,6 +90,7 @@ router.post('/',  checkAuth, (req, res, next) => {
                 price: result.price,
                 category: result.category,
                 availability: result.availability,
+                newProduct: result.newProduct,
                 _id: result._id,
                 request: {
                     type: "GET",
@@ -123,7 +126,7 @@ router.delete('/:productID', (req, res, enxt) => {
 })
 
 //Edit a product
-router.patch('/:productId',  checkAuth, (req, res, next) => {
+router.patch('/:productId', (req, res, next) => {
 
     const productId = req.params.productId; 
 
